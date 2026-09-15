@@ -1,12 +1,24 @@
-export default async function App({
-  params,
-}: {
-  params: Promise<{ id: string }>;
-}) {
-  const { id } = await params;
+"use client";
 
-  const response = await fetch("https://jsonplaceholder.typicode.com/users");
-  const data = await response.json();
+import { useEffect, useState } from "react";
+import { useParams } from "next/navigation";
 
-  return <div>{data[Number(id) - 1]?.email}</div>;
+type User = {
+  id: number;
+  email: string;
+};
+
+export default function Page() {
+  const params = useParams<{ id: string }>();
+  const [users, setUsers] = useState<User[]>([]);
+
+  useEffect(() => {
+    fetch("/api/users")
+      .then((response) => response.json())
+      .then((data) => {
+        setUsers(data);
+      });
+  }, []);
+
+  return <div>{users[Number(params.id) - 1]?.email}</div>;
 }

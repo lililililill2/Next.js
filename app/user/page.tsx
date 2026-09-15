@@ -1,7 +1,32 @@
-export default async function App() {
+"use client";
+
+import { useEffect, useState } from "react";
+
+type User = {
+  id: number;
+  name: string;
+  email: string;
+};
+
+export default function Page() {
+  const [users, setUsers] = useState<User[]>([]);
+
+  useEffect(() => {
+    fetch("/api/users")
+      .then((response) => response.json())
+      .then((data) => {
+        setUsers(data);
+      });
+  }, []);
+
   return (
     <div>
-      주소 뒤에 id를 붙여서 원하는 이메일을 찾아봅시다. 1부터 10 사이 id 입력.
+      {users.map((user) => (
+        <div key={user.id}>
+          <p>이름 {user.name}</p>
+          <p>이메일 {user.email}</p>
+        </div>
+      ))}
     </div>
   );
 }

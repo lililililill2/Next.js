@@ -1,39 +1,52 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { getPosts, getUsers } from "./data";
 
 function App() {
   const [posts, setPosts] = useState<any[]>([]);
+  const [search, setSearch] = useState("");
+  const [users, setUsers] = useState<any[]>([]);
 
   useEffect(() => {
-    fetch("/api/posts")
-      .then((response) => {
-        if (!response.ok) {
-          throw new Error("에러");
-        }
-        return response.json();
-      })
-      .then((data) => {
-        setPosts(data);
-      })
-      .catch((error) => {
-        console.log(error);
-      })
-      .finally(() => {
-        console.log("끝");
-      });
+    getPosts().then((data) => {
+      setPosts(data);
+    });
+
+    getUsers().then((data) => {
+      setUsers(data);
+    });
   }, []);
+
+  const filter = posts.filter((post) => post.title.includes(search));
 
   return (
     <>
-      <div>jsonplaceholder 제목!</div>
+      <div>jsonplaceholder 게시글</div>
+      <input
+        type="text"
+        placeholder="입력창"
+        onChange={(e) => setSearch(e.target.value)}
+      />
+      <hr />
 
-      <hr></hr>
+      {filter.length === 0 ? (
+        <div>검색 결과가 없습니다.</div>
+      ) : (
+        filter.map((post) => {
+          const user = users.find((user) => user.id === post.userId);
 
-      <div>0.{posts[0]?.title}</div>
-      <div>1.{posts[1]?.title}</div>
-      <div>2.{posts[2]?.title}</div>
-      <div>3.{posts[3]?.title}</div>
+          return (
+            <div key={post.id}>
+              <div>제목: {post.title}</div>
+              <br />
+              <div>작성자:{user?.name}</div>
+
+              <hr />
+            </div>
+          );
+        })
+      )}
     </>
   );
 }
