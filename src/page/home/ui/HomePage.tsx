@@ -1,30 +1,42 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
+import { useQuery } from "@tanstack/react-query";
+
 import { getPosts } from "../../../entities/post/api/getPosts";
 import { getUsers } from "../../../entities/user/api/getUsers";
+
 import { PostSearch } from "../../../features/post-search/ui/PostSearch";
 import { PostItem } from "../../../entities/post/ui/PostItem";
-import type { Post } from "../../../entities/post/model/Post";
-import type { User } from "../../../entities/user/model/User";
+
 import { filterPosts } from "../../../features/post-search/model/filterPosts";
 
 export function HomePage() {
-  const [posts, setPosts] = useState<Post[]>([]);
   const [search, setSearch] = useState("");
-  const [users, setUsers] = useState<User[]>([]);
 
-  useEffect(() => {
-    getPosts().then((data) => {
-      setPosts(data);
-    });
+  const {
+    data: posts = [],
+    isPending,
+    isError,
+  } = useQuery({
+    queryKey: ["posts"],
+    queryFn: getPosts,
+  });
 
-    getUsers().then((data) => {
-      setUsers(data);
-    });
-  }, []);
+  const { data: users = [] } = useQuery({
+    queryKey: ["users"],
+    queryFn: getUsers,
+  });
 
-  const filter = filterPosts(posts, search);
+  if (isPending) {
+    return <div>로딩 중...</div>;
+  }
+
+  if (isError) {
+    return <div>에러 발생!</div>;
+  }
+
+  const filteredPosts = filterPosts(posts, search);
 
   return (
     <>
@@ -34,15 +46,11 @@ export function HomePage() {
 
       <hr />
 
-      {filter.length === 0 ? (
-        <div>검색 결과가 없습니다.</div>
-      ) : (
-        filter.map((post) => {
-          const user = users.find((user) => user.id === post.userId);
+      {filteredPosts.map((post) => {
+        const user = users.find((user) => user.id === post.userId);
 
-          return <PostItem key={post.id} post={post} authorName={user?.name} />;
-        })
-      )}
+        return <PostItem key={post.id} post={post} authorName={user?.name} />;
+      })}
     </>
   );
 }

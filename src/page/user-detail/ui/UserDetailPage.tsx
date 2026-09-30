@@ -1,21 +1,29 @@
 "use client";
 
-import { useEffect, useState } from "react";
 import { useParams } from "next/navigation";
+import { useQuery } from "@tanstack/react-query";
+
 import { getUsers } from "../../../entities/user/api/getUsers";
-import type { User } from "../../../entities/user/model/User";
 
 export function UserDetailPage() {
   const params = useParams<{ id: string }>();
-  const [users, setUsers] = useState<User[]>([]);
 
-  useEffect(() => {
-    getUsers().then((data) => {
-      if (data) {
-        setUsers(data);
-      }
-    });
-  }, []);
+  const {
+    data: users = [],
+    isPending,
+    isError,
+  } = useQuery({
+    queryKey: ["users"],
+    queryFn: getUsers,
+  });
+
+  if (isPending) {
+    return <div>로딩 중...</div>;
+  }
+
+  if (isError) {
+    return <div>에러 발생!</div>;
+  }
 
   const user = users.find((user) => user.id === Number(params.id));
 

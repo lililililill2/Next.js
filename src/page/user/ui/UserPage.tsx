@@ -1,20 +1,27 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useQuery } from "@tanstack/react-query";
+
 import { getUsers } from "../../../entities/user/api/getUsers";
 import { UserItem } from "../../../entities/user/ui/UserItem";
-import type { User } from "../../../entities/user/model/User";
 
 export function UserPage() {
-  const [users, setUsers] = useState<User[]>([]);
+  const {
+    data: users = [],
+    isPending,
+    isError,
+  } = useQuery({
+    queryKey: ["users"],
+    queryFn: getUsers,
+  });
 
-  useEffect(() => {
-    getUsers().then((data) => {
-      if (data) {
-        setUsers(data);
-      }
-    });
-  }, []);
+  if (isPending) {
+    return <div>로딩 중...</div>;
+  }
+
+  if (isError) {
+    return <div>에러 발생!</div>;
+  }
 
   return (
     <div>
