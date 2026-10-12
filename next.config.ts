@@ -4,7 +4,7 @@ const nextConfig: NextConfig = {
   async rewrites() {
     return [
       {
-        source: "/api/:path*", // :path* 뜻: 뒤에 오는 경로를 전부 변수처럼 받는다
+        source: "/api/:path*",
         destination: "https://jsonplaceholder.typicode.com/:path*",
       },
     ];
