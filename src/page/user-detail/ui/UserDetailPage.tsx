@@ -3,7 +3,7 @@
 import { useParams } from "next/navigation";
 import { useQuery } from "@tanstack/react-query";
 
-import { getUsers } from "../../../entities/user/api/getUsers";
+import { getUsers } from "@/entities/user";
 
 export function UserDetailPage() {
   const params = useParams<{ id: string }>();

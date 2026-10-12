@@ -2,8 +2,8 @@
 
 import { useQuery } from "@tanstack/react-query";
 
-import { getUsers } from "../../../entities/user/api/getUsers";
-import { UserItem } from "../../../entities/user/ui/UserItem";
+import { getUsers } from "@/entities/user";
+import { UserItem } from "@/entities/user";
 
 export function UserPage() {
   const {
