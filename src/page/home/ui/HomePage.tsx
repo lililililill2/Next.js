@@ -3,13 +3,13 @@
 import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 
-import { getPosts } from "../../../entities/post/api/getPosts";
-import { getUsers } from "../../../entities/user/api/getUsers";
+import { getPosts } from "@/entities/post";
+import { getUsers } from "@/entities/user";
 
-import { PostSearch } from "../../../features/post-search/ui/PostSearch";
-import { PostItem } from "../../../entities/post/ui/PostItem";
+import { PostSearch } from "@/features/post-search";
+import { PostManager } from "@/features/post-manage";
 
-import { filterPosts } from "../../../features/post-search/model/filterPosts";
+import { filterPosts } from "@/features/post-search";
 
 export function HomePage() {
   const [search, setSearch] = useState("");
@@ -21,19 +21,24 @@ export function HomePage() {
   } = useQuery({
     queryKey: ["posts"],
     queryFn: getPosts,
+    staleTime: Infinity,
   });
 
-  const { data: users = [] } = useQuery({
+  const {
+    data: users = [],
+    isPending: isUsersPending,
+    isError: isUsersError,
+  } = useQuery({
     queryKey: ["users"],
     queryFn: getUsers,
   });
 
-  if (isPending) {
-    return <div>로딩 중...</div>;
+  if (isError || isUsersError) {
+    return <div role="alert">데이터를 가져오지 못했습니다.</div>;
   }
 
-  if (isError) {
-    return <div>에러 발생!</div>;
+  if (isPending || isUsersPending) {
+    return <div>로딩 중...</div>;
   }
 
   const filteredPosts = filterPosts(posts, search);
@@ -46,11 +51,7 @@ export function HomePage() {
 
       <hr />
 
-      {filteredPosts.map((post) => {
-        const user = users.find((user) => user.id === post.userId);
-
-        return <PostItem key={post.id} post={post} authorName={user?.name} />;
-      })}
+      <PostManager posts={filteredPosts} users={users} />
     </>
   );
 }

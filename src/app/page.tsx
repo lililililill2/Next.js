@@ -1,10 +1,5 @@
-import { HomePage } from "../page/home/ui/HomePage";
-import QueryProvider from "./providers/QueryProvider";
+import { HomePage } from "@/page/home";
 
 export default function Page() {
-  return (
-    <QueryProvider>
-      <HomePage />
-    </QueryProvider>
-  );
+  return <HomePage />;
 }

@@ -1,4 +1,4 @@
-import { request } from "../../../shared/api/request";
+import { request } from "@/shared/api";
 import type { User } from "../model/User";
 
 export function getUsers() {
